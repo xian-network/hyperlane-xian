@@ -1,0 +1,24 @@
+blockExplorers:
+  - apiUrl: https://testnet.xian.org
+    family: other
+    name: Xian Testnet Explorer
+    url: https://testnet-explorer.xian.org
+blocks:
+  confirmations: 1
+  estimateBlockTime: 5
+  reorgPeriod: 1
+chainId: xian-testnet-11
+displayName: Xian Testnet
+// Generate using console.log(parseInt('0x' + [...new TextEncoder().encode('xiant')].map(b => b.toString(16).padStart(2, '0')).join('')));
+domainId: 517164068468
+name: xiantestnet
+nativeToken:
+  decimals: 8
+  name: Xian
+  symbol: XIAN
+protocol: cosmos
+restUrls:
+  - http: https://testnet.xian.org
+rpcUrls:
+  - http: https://testnet.xian.org
+technicalStack: other

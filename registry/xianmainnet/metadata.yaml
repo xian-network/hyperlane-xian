@@ -1,0 +1,24 @@
+blockExplorers:
+  - apiUrl: https://node.xian.org
+    family: other
+    name: Xian Explorer
+    url: https://explorer.xian.org
+blocks:
+  confirmations: 1
+  estimateBlockTime: 5
+  reorgPeriod: 1
+chainId: xian-network-1
+displayName: Xian
+// Generate using console.log(parseInt('0x' + [...new TextEncoder().encode('xian')].map(b => b.toString(16).padStart(2, '0')).join('')));
+domainId: 2020172142
+name: xian
+nativeToken:
+  decimals: 8
+  name: Xian
+  symbol: XIAN
+protocol: cosmos
+restUrls:
+  - http: https://node.xian.org
+rpcUrls:
+  - http: https://node.xian.org
+technicalStack: other
