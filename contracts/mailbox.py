@@ -171,7 +171,6 @@ def dispatch(destination_domain: int,
     nonce.set(current_nonce + 1)
     latestDispatchedId.set(msg_id)
 
-    # Emit an event instead of storing in a logs variable
     DispatchEvent({
         "sender": ctx.caller,
         "origin_domain": origin,
