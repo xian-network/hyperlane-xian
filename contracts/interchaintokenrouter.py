@@ -28,8 +28,7 @@ def seed(domain: int, mailbox_contract_name: str):
     mailbox_contract.set(mailbox_contract_name)
 
 def only_owner():
-    if ctx.caller != owner.get():
-        raise Exception("Only the owner can call this function.")
+    assert ctx.caller == owner.get(), "Only the contract owner can call this method."
 
 @export
 def setTokenForDomain(domain_id: int, token_name: str):
@@ -43,7 +42,7 @@ def setTokenForDomain(domain_id: int, token_name: str):
     tokensByDomain[domain_id] = token_name
 
 @export
-def getTokenForDomain(domain_id: int) -> str:
+def getTokenForDomain(domain_id: int):
     return tokensByDomain[domain_id]
 
 @export
@@ -65,14 +64,13 @@ def process(message_body: str, message_id: str):
     # Parse out the bridging details
     # Format: sender|recipient|amount|originDomain
     parts = message_body.split("|")
-    if len(parts) != 4:
-        raise Exception("Invalid message format.")
+    assert len(parts) == 4, "Invalid message format."
     sender = parts[0]
     recipient = parts[1]
     amount_str = parts[2]
     origin_domain_str = parts[3]
 
-    amount = float(amount_str)
+    amount = decimal(amount_str)
     origin_domain = int(origin_domain_str)
 
     RouterMessageEvent({
@@ -84,8 +82,7 @@ def process(message_body: str, message_id: str):
     # Now we call the local InterchainToken to mint tokens
     # 1. We look up the local InterchainToken name for this domain
     local_token_name = tokensByDomain[localDomain.get()]
-    if not local_token_name:
-        raise Exception("No InterchainToken set for this local domain in the router.")
+    assert local_token_name, "No InterchainToken configured for this domain."
 
     interchain_token = importlib.import_module(local_token_name)
 

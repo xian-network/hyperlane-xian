@@ -76,62 +76,49 @@ def seed(domain: int, router: str, mailbox_contract: str, interchain_router_cont
 # ------------------------------------------------------------------------------
 
 def only_owner():
-    if ctx.caller != owner.get():
-        raise Exception("Only the owner can call this function.")
+    assert ctx.caller == owner.get(), "Only the owner can call this function."
 
 def only_router():
     """
     In a Hyperlane-like system, only the router on this chain
     should call cross-chain mint, to ensure security & message authenticity.
     """
-    if ctx.caller != routerName.get():
-        raise Exception("Only the configured router can call this function.")
+    assert ctx.caller == routerName.get(), "Only the router can call this function."
 
 # ------------------------------------------------------------------------------
 # ERC20-LIKE METHODS
 # ------------------------------------------------------------------------------
 
 @export
-def balanceOf(account: str) -> float:
-    return balances[account]
+def balance_of(address: str):
+    return balances[address]
 
 @export
 def transfer(amount: float, to: str):
     assert amount > 0, 'Cannot send negative balances!'
+    assert balances[ctx.caller] >= amount, 'Not enough coins to send!'
 
-    sender = ctx.caller
-
-    assert balances[sender] >= amount, 'Not enough coins to send!'
-
-    balances[sender] -= amount
+    balances[ctx.caller] -= amount
     balances[to] += amount
-
-@export
-def allowance(owner: str, spender: str):
-    return balances[owner, spender]
+    TransferEvent({"from": ctx.caller, "to": to, "amount": amount})
 
 @export
 def approve(amount: float, to: str):
-    assert amount > 0, 'Cannot send negative balances!'
-
-    sender = ctx.caller
-    balances[sender, to] += amount
-    return balances[sender, to]
+    assert amount >= 0, 'Cannot approve negative balances!'
+    
+    balances[ctx.caller, to] = amount
+    ApproveEvent({"from": ctx.caller, "to": to, "amount": amount})
 
 @export
 def transfer_from(amount: float, to: str, main_account: str):
     assert amount > 0, 'Cannot send negative balances!'
-
-    sender = ctx.caller
-
-    assert balances[main_account, sender] >= amount, 'Not enough coins approved to send! You have {} and are trying to spend {}'\
-        .format(balances[main_account, sender], amount)
+    assert balances[main_account, ctx.caller] >= amount, f'Not enough coins approved to send! You have {balances[main_account, ctx.caller]} and are trying to spend {amount}'
     assert balances[main_account] >= amount, 'Not enough coins to send!'
 
-    balances[main_account, sender] -= amount
+    balances[main_account, ctx.caller] -= amount
     balances[main_account] -= amount
-
     balances[to] += amount
+    TransferEvent({"from": main_account, "to": to, "amount": amount})
 
 
 @export
